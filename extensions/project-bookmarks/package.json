@@ -2,7 +2,7 @@
   "name": "project-bookmarks",
   "displayName": "Project Bookmarks",
   "description": "Bookmark projects (local, WSL, dev containers, SSH) and reopen them from a status bar icon.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "local",
   "private": true,
   "license": "UNLICENSED",
@@ -32,6 +32,11 @@
       {
         "command": "projectBookmarks.removeCurrent",
         "title": "Remove Current Project from Bookmarks",
+        "category": "Project Bookmarks"
+      },
+      {
+        "command": "projectBookmarks.openStorageFile",
+        "title": "Open Bookmarks File",
         "category": "Project Bookmarks"
       }
     ],

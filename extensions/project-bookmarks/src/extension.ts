@@ -1,3 +1,6 @@
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 
 /** One saved project. `uri` is the full folder/workspace URI, including the remote authority. */
@@ -8,16 +11,19 @@ interface Bookmark {
   isWorkspaceFile: boolean;
 }
 
-const STORAGE_KEY = 'bookmarks';
+const LEGACY_STATE_KEY = 'bookmarks';
 const CONTEXT_KEY = 'projectBookmarks.currentIsBookmarked';
 
 // This extension is `extensionKind: ["ui"]`, so it runs in the local VS Code, not inside the
-// container. globalState is therefore one store shared by every window: local, WSL, dev containers.
-let state: vscode.Memento;
+// container. Bookmarks live in a plain JSON file in the local home folder, so they are shared by
+// every window (local, WSL, dev containers) and every VS Code profile. globalState is per profile,
+// which is why it is not used.
+const STORAGE_FILE = path.join(os.homedir(), '.vscode-project-bookmarks.json');
+
 let statusItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext): void {
-  state = context.globalState;
+  void migrateFromGlobalState(context.globalState);
 
   statusItem = vscode.window.createStatusBarItem(
     'projectBookmarks.status',
@@ -33,6 +39,9 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('projectBookmarks.show', showBookmarks),
     vscode.commands.registerCommand('projectBookmarks.addCurrent', addCurrent),
     vscode.commands.registerCommand('projectBookmarks.removeCurrent', removeCurrent),
+    vscode.commands.registerCommand('projectBookmarks.openStorageFile', () =>
+      vscode.window.showTextDocument(vscode.Uri.file(STORAGE_FILE)),
+    ),
     vscode.workspace.onDidChangeWorkspaceFolders(refreshStatus),
     // Another window may have changed the list; re-read it when this window gets focus.
     vscode.window.onDidChangeWindowState((s) => s.focused && refreshStatus()),
@@ -47,12 +56,43 @@ export function deactivate(): void {
 // ---------- storage ----------
 
 function load(): Bookmark[] {
-  return state.get<Bookmark[]>(STORAGE_KEY, []);
+  try {
+    const data: unknown = JSON.parse(fs.readFileSync(STORAGE_FILE, 'utf8'));
+    return Array.isArray(data)
+      ? data.filter(
+          (b): b is Bookmark => typeof b?.uri === 'string' && typeof b?.label === 'string',
+        )
+      : [];
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      void vscode.window.showErrorMessage(
+        `Project Bookmarks: cannot read ${STORAGE_FILE}: ${(err as Error).message}`,
+      );
+    }
+    return [];
+  }
 }
 
 async function save(list: Bookmark[]): Promise<void> {
-  await state.update(STORAGE_KEY, list);
+  // Write to a temp file and rename, so another window never reads a half-written file.
+  const tmp = `${STORAGE_FILE}.${process.pid}.tmp`;
+  await fs.promises.writeFile(tmp, JSON.stringify(list, null, 2) + '\n');
+  await fs.promises.rename(tmp, STORAGE_FILE);
   refreshStatus();
+}
+
+/** Earlier versions kept bookmarks in (per-profile) globalState; merge them into the file once. */
+async function migrateFromGlobalState(state: vscode.Memento): Promise<void> {
+  const old = state.get<Bookmark[]>(LEGACY_STATE_KEY);
+  if (!old?.length) {
+    return;
+  }
+  const list = load();
+  const added = old.filter((b) => !list.some((x) => x.uri === b.uri));
+  if (added.length) {
+    await save([...list, ...added]);
+  }
+  await state.update(LEGACY_STATE_KEY, undefined);
 }
 
 // ---------- current project ----------

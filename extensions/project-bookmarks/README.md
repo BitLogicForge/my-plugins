@@ -22,10 +22,14 @@ Bookmark the project open in the current window (local folder, WSL, dev containe
 
 ## Where bookmarks are stored
 
+Bookmarks are kept in `~/.vscode-project-bookmarks.json` on the local machine (on Windows,
+`C:\\Users\\<you>\\.vscode-project-bookmarks.json`). The same file is used by every window and every VS
+Code profile. `Project Bookmarks: Open Bookmarks File` opens it if you want to edit it by hand.
+
 The extension is a UI extension (`extensionKind: ["ui"]`), so it runs in your local VS Code, even
-in a dev container window. Bookmarks live in its global state on the local machine and are shared by
-every window. Install the `.vsix` into **local** VS Code (it should be listed under
-"Local - Installed" in the Extensions view), not into a container.
+in a dev container window. Install the `.vsix` into **local** VS Code (it should be listed under
+"Local - Installed" in the Extensions view), not into a container. To have it in every profile,
+right-click it in the Extensions view and choose **Apply Extension to all Profiles**.
 
 When you debug with F5 from inside the dev container, the Extension Development Host runs the
-extension in the container, so bookmarks made there are separate from your installed copy.
+extension in the container, so it reads the file in the container's home folder instead.
