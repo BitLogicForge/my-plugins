@@ -1,0 +1,37 @@
+{
+  "name": "__NAME__",
+  "displayName": "__DISPLAY_NAME__",
+  "description": "",
+  "version": "0.0.1",
+  "publisher": "__PUBLISHER__",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "__COMMAND_PREFIX__.helloWorld",
+        "title": "Hello World",
+        "category": "__DISPLAY_NAME__"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node ../../scripts/build.mjs .",
+    "watch": "node ../../scripts/build.mjs --watch .",
+    "typecheck": "tsc -p . --noEmit",
+    "lint": "eslint src",
+    "compile-tests": "tsc -p . --outDir out",
+    "pretest": "npm run build && npm run compile-tests",
+    "test": "vscode-test",
+    "vscode:prepublish": "node ../../scripts/build.mjs --production .",
+    "package": "mkdir -p ../../packages && vsce package --no-dependencies --skip-license --allow-missing-repository --out ../../packages/"
+  }
+}

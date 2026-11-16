@@ -1,0 +1,8 @@
+# Everything is bundled into dist/, so ship only that plus the manifest/docs.
+**
+!dist/extension.js
+!package.json
+!README.md
+!CHANGELOG.md
+!LICENSE*
+!media/**

@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "watch: all",
+      "type": "shell",
+      "command": "node scripts/build.mjs --watch",
+      "isBackground": true,
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "never", "group": "watch" },
+      "problemMatcher": {
+        "owner": "esbuild",
+        "fileLocation": "absolute",
+        "pattern": [
+          { "regexp": "^✘ \\[ERROR\\] (.*)$", "message": 1 },
+          { "regexp": "^\\s+(.*):(\\d+):(\\d+):$", "file": 1, "line": 2, "column": 3 }
+        ],
+        "background": {
+          "activeBegins": true,
+          "beginsPattern": "^\\[watch\\] build started",
+          "endsPattern": "^\\[watch\\] build finished"
+        }
+      }
+    },
+    {
+      "label": "build: all",
+      "type": "shell",
+      "command": "node scripts/build.mjs",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "typecheck: all",
+      "type": "shell",
+      "command": "npm run typecheck --workspaces --if-present",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "lint: all",
+      "type": "shell",
+      "command": "npx eslint extensions",
+      "problemMatcher": "$eslint-stylish"
+    }
+  ]
+}
