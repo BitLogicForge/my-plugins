@@ -9,8 +9,14 @@ suite('Project Bookmarks', () => {
     assert.ok(ext.isActive);
   });
 
-  test('registers the hello command', async () => {
+  test('registers its commands', async () => {
     const commands = await vscode.commands.getCommands(true);
-    assert.ok(commands.includes('projectBookmarks.helloWorld'));
+    for (const c of [
+      'projectBookmarks.show',
+      'projectBookmarks.addCurrent',
+      'projectBookmarks.removeCurrent',
+    ]) {
+      assert.ok(commands.includes(c), c);
+    }
   });
 });

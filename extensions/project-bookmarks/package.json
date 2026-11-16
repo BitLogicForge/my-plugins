@@ -1,7 +1,7 @@
 {
   "name": "project-bookmarks",
   "displayName": "Project Bookmarks",
-  "description": "",
+  "description": "Bookmark projects (local, WSL, dev containers, SSH) and reopen them from a status bar icon.",
   "version": "0.0.1",
   "publisher": "local",
   "private": true,
@@ -13,15 +13,40 @@
     "Other"
   ],
   "main": "./dist/extension.js",
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "contributes": {
     "commands": [
       {
-        "command": "projectBookmarks.helloWorld",
-        "title": "Hello World",
+        "command": "projectBookmarks.show",
+        "title": "Show Bookmarks",
+        "category": "Project Bookmarks",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "projectBookmarks.addCurrent",
+        "title": "Bookmark Current Project",
+        "category": "Project Bookmarks"
+      },
+      {
+        "command": "projectBookmarks.removeCurrent",
+        "title": "Remove Current Project from Bookmarks",
         "category": "Project Bookmarks"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "projectBookmarks.addCurrent",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "projectBookmarks.removeCurrent",
+          "when": "projectBookmarks.currentIsBookmarked"
+        }
+      ]
+    }
   },
   "scripts": {
     "build": "node ../../scripts/build.mjs .",
@@ -33,5 +58,8 @@
     "test": "vscode-test",
     "vscode:prepublish": "node ../../scripts/build.mjs --production .",
     "package": "mkdir -p ../../packages && vsce package --no-dependencies --skip-license --allow-missing-repository --out ../../packages/"
-  }
+  },
+  "extensionKind": [
+    "ui"
+  ]
 }
