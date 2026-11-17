@@ -1,8 +1,8 @@
 {
   "name": "snippet-shelf",
   "displayName": "Snippet Shelf",
-  "description": "Your own categorized snippets (shell commands, text) in one JSON file shared by every profile and window, with git/editor variables and prompts.",
-  "version": "0.0.2",
+  "description": "Your own categorized snippets (mainly git commands) in one JSON file shared by every profile and window, with git-aware variables, pickers and prompts.",
+  "version": "0.0.4",
   "publisher": "local",
   "private": true,
   "license": "UNLICENSED",
@@ -47,6 +47,11 @@
         "category": "Snippet Shelf"
       },
       {
+        "command": "snippetShelf.addExamples",
+        "title": "Add Example Snippets",
+        "category": "Snippet Shelf"
+      },
+      {
         "command": "snippetShelf.tree.refresh",
         "title": "Refresh",
         "category": "Snippet Shelf",
@@ -81,6 +86,12 @@
         "title": "Copy",
         "category": "Snippet Shelf",
         "icon": "$(copy)"
+      },
+      {
+        "command": "snippetShelf.tree.open",
+        "title": "Open in Browser",
+        "category": "Snippet Shelf",
+        "icon": "$(link-external)"
       },
       {
         "command": "snippetShelf.tree.reveal",
@@ -125,6 +136,10 @@
         },
         {
           "command": "snippetShelf.tree.reveal",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.open",
           "when": "false"
         }
       ],
@@ -179,6 +194,16 @@
           "group": "inline@4"
         },
         {
+          "command": "snippetShelf.tree.open",
+          "when": "view == snippetShelf.tree && viewItem == snippetOpen",
+          "group": "inline@1"
+        },
+        {
+          "command": "snippetShelf.tree.copy",
+          "when": "view == snippetShelf.tree && viewItem == snippetOpen",
+          "group": "inline@2"
+        },
+        {
           "command": "snippetShelf.tree.run",
           "when": "view == snippetShelf.tree && viewItem == snippet",
           "group": "1_actions@1"
@@ -199,8 +224,18 @@
           "group": "1_actions@4"
         },
         {
+          "command": "snippetShelf.tree.open",
+          "when": "view == snippetShelf.tree && viewItem == snippetOpen",
+          "group": "1_actions@1"
+        },
+        {
+          "command": "snippetShelf.tree.copy",
+          "when": "view == snippetShelf.tree && viewItem == snippetOpen",
+          "group": "1_actions@2"
+        },
+        {
           "command": "snippetShelf.tree.reveal",
-          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "when": "view == snippetShelf.tree && viewItem =~ /^snippet/",
           "group": "2_edit@1"
         }
       ]
@@ -232,7 +267,7 @@
     "viewsWelcome": [
       {
         "view": "snippetShelf.tree",
-        "contents": "No snippets yet.\n[Edit Snippets File](command:snippetShelf.openFile)"
+        "contents": "No snippets yet.\n[Edit Snippets File](command:snippetShelf.openFile)\n[Add Example Snippets](command:snippetShelf.addExamples)"
       }
     ],
     "keybindings": [
