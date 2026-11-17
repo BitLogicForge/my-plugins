@@ -15,6 +15,8 @@ interface Snippet {
   description?: string;
   body: string;
   action: Action;
+  /** Position inside its category's array in the file. */
+  index: number;
 }
 
 // This extension is `extensionKind: ["ui"]`, so it runs in the local VS Code, not inside the
@@ -171,6 +173,7 @@ async function load(): Promise<Snippet[] | undefined> {
         description: typeof raw.description === 'string' ? raw.description : undefined,
         body,
         action,
+        index: i,
       });
     });
   }
@@ -755,6 +758,75 @@ async function showVariables(): Promise<void> {
   }
 }
 
+// ---------- sidebar tree ----------
+
+type Node = { category: string; snippets: Snippet[] } | Snippet;
+const isSnippet = (n: Node): n is Snippet => 'body' in n;
+
+class SnippetTree implements vscode.TreeDataProvider<Node> {
+  private readonly changed = new vscode.EventEmitter<void>();
+  readonly onDidChangeTreeData = this.changed.event;
+  private snippets: Snippet[] = [];
+
+  refresh(): void {
+    this.changed.fire();
+  }
+
+  async getChildren(node?: Node): Promise<Node[]> {
+    if (node) {
+      return isSnippet(node) ? [] : node.snippets;
+    }
+    this.snippets = (await load()) ?? [];
+    const groups = new Map<string, Snippet[]>();
+    for (const s of this.snippets) {
+      groups.set(s.category, [...(groups.get(s.category) ?? []), s]);
+    }
+    return [...groups].map(([category, snippets]) => ({ category, snippets }));
+  }
+
+  getTreeItem(node: Node): vscode.TreeItem {
+    if (!isSnippet(node)) {
+      const item = new vscode.TreeItem(node.category, vscode.TreeItemCollapsibleState.Expanded);
+      item.id = `cat:${node.category}`;
+      item.iconPath = new vscode.ThemeIcon('folder');
+      item.description = String(node.snippets.length);
+      item.contextValue = 'category';
+      return item;
+    }
+    const item = new vscode.TreeItem(node.name, vscode.TreeItemCollapsibleState.None);
+    item.id = `snip:${node.category}:${node.index}`;
+    item.iconPath = new vscode.ThemeIcon(ACTION_INFO[node.action].icon);
+    item.description = node.description ?? preview(node.body);
+    const tooltip = new vscode.MarkdownString();
+    tooltip.appendMarkdown(`**${node.name}** · Enter: ${ACTION_INFO[node.action].label}\n\n`);
+    tooltip.appendCodeblock(node.body, 'shellscript');
+    item.tooltip = tooltip;
+    item.contextValue = 'snippet';
+    // Clicking only selects; running is done with the inline buttons (or Enter via the command
+    // below), so a stray click never runs a command in the terminal.
+    return item;
+  }
+}
+
+/** Opens the snippets file with the cursor on the given snippet. */
+async function revealInFile(snippet: Snippet): Promise<void> {
+  await openFile();
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return;
+  }
+  const root = jsonc.parseTree(editor.document.getText());
+  const node = root && jsonc.findNodeAtLocation(root, [snippet.category, snippet.index]);
+  if (node) {
+    const range = new vscode.Range(
+      editor.document.positionAt(node.offset),
+      editor.document.positionAt(node.offset + node.length),
+    );
+    editor.selection = new vscode.Selection(range.start, range.start);
+    editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+  }
+}
+
 // ---------- activation ----------
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -776,6 +848,35 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('snippetShelf.openFile', openFile),
     vscode.commands.registerCommand('snippetShelf.addFromSelection', addFromSelection),
     vscode.commands.registerCommand('snippetShelf.showVariables', showVariables),
+  );
+
+  const tree = new SnippetTree();
+  const view = vscode.window.createTreeView('snippetShelf.tree', {
+    treeDataProvider: tree,
+    showCollapseAll: true,
+  });
+  // Re-read the file when it changes (saved here, in another window, or by "Save as snippet").
+  const onFileChange = () => tree.refresh();
+  fs.watchFile(STORAGE_FILE, { interval: 1000 }, onFileChange);
+
+  const treeAction = (action?: Action) => (node?: Node) => {
+    const target = node ?? view.selection[0];
+    if (target && isSnippet(target)) {
+      void perform(target, action);
+    }
+  };
+  context.subscriptions.push(
+    view,
+    { dispose: () => fs.unwatchFile(STORAGE_FILE, onFileChange) },
+    vscode.commands.registerCommand('snippetShelf.tree.refresh', () => tree.refresh()),
+    vscode.commands.registerCommand('snippetShelf.tree.default', treeAction()),
+    ...ACTIONS.map((a) => vscode.commands.registerCommand(`snippetShelf.tree.${a}`, treeAction(a))),
+    vscode.commands.registerCommand('snippetShelf.tree.reveal', (node?: Node) => {
+      const target = node ?? view.selection[0];
+      if (target && isSnippet(target)) {
+        void revealInFile(target);
+      }
+    }),
   );
 }
 

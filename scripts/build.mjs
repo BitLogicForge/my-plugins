@@ -58,6 +58,9 @@ const contexts = await Promise.all(
       platform: 'node',
       target: 'node20',
       external: ['vscode'],
+      // Prefer ESM builds: some packages (e.g. jsonc-parser) ship a UMD "main" whose internal
+      // require() calls esbuild cannot follow, which breaks the bundle at runtime.
+      mainFields: ['module', 'main'],
       minify: production,
       sourcemap: !production,
       sourcesContent: false,

@@ -2,7 +2,7 @@
   "name": "snippet-shelf",
   "displayName": "Snippet Shelf",
   "description": "Your own categorized snippets (shell commands, text) in one JSON file shared by every profile and window, with git/editor variables and prompts.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "local",
   "private": true,
   "license": "UNLICENSED",
@@ -45,6 +45,48 @@
         "command": "snippetShelf.showVariables",
         "title": "Show Variable Values",
         "category": "Snippet Shelf"
+      },
+      {
+        "command": "snippetShelf.tree.refresh",
+        "title": "Refresh",
+        "category": "Snippet Shelf",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "snippetShelf.tree.default",
+        "title": "Run Default Action",
+        "category": "Snippet Shelf",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "snippetShelf.tree.run",
+        "title": "Run in Terminal",
+        "category": "Snippet Shelf",
+        "icon": "$(play)"
+      },
+      {
+        "command": "snippetShelf.tree.paste",
+        "title": "Paste into Terminal (Don’t Run)",
+        "category": "Snippet Shelf",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "snippetShelf.tree.insert",
+        "title": "Insert into Editor",
+        "category": "Snippet Shelf",
+        "icon": "$(insert)"
+      },
+      {
+        "command": "snippetShelf.tree.copy",
+        "title": "Copy",
+        "category": "Snippet Shelf",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "snippetShelf.tree.reveal",
+        "title": "Edit in Snippets File",
+        "category": "Snippet Shelf",
+        "icon": "$(go-to-file)"
       }
     ],
     "menus": {
@@ -55,6 +97,34 @@
         },
         {
           "command": "snippetShelf.run",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.refresh",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.default",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.run",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.paste",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.insert",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.copy",
+          "when": "false"
+        },
+        {
+          "command": "snippetShelf.tree.reveal",
           "when": "false"
         }
       ],
@@ -70,6 +140,68 @@
           "command": "snippetShelf.show",
           "when": "view == terminal",
           "group": "navigation@99"
+        },
+        {
+          "command": "snippetShelf.show",
+          "when": "view == snippetShelf.tree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "snippetShelf.openFile",
+          "when": "view == snippetShelf.tree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "snippetShelf.tree.refresh",
+          "when": "view == snippetShelf.tree",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "snippetShelf.tree.run",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "inline@1"
+        },
+        {
+          "command": "snippetShelf.tree.paste",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "inline@2"
+        },
+        {
+          "command": "snippetShelf.tree.insert",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "inline@3"
+        },
+        {
+          "command": "snippetShelf.tree.copy",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "inline@4"
+        },
+        {
+          "command": "snippetShelf.tree.run",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "1_actions@1"
+        },
+        {
+          "command": "snippetShelf.tree.paste",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "1_actions@2"
+        },
+        {
+          "command": "snippetShelf.tree.insert",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "1_actions@3"
+        },
+        {
+          "command": "snippetShelf.tree.copy",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "1_actions@4"
+        },
+        {
+          "command": "snippetShelf.tree.reveal",
+          "when": "view == snippetShelf.tree && viewItem == snippet",
+          "group": "2_edit@1"
         }
       ]
     },
@@ -77,6 +209,37 @@
       {
         "fileMatch": "**/.snippet-shelf.jsonc",
         "url": "./schemas/snippets.schema.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "snippetShelf",
+          "title": "Snippet Shelf",
+          "icon": "media/snippets.svg"
+        }
+      ]
+    },
+    "views": {
+      "snippetShelf": [
+        {
+          "id": "snippetShelf.tree",
+          "name": "Snippets",
+          "icon": "media/snippets.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "snippetShelf.tree",
+        "contents": "No snippets yet.\n[Edit Snippets File](command:snippetShelf.openFile)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "snippetShelf.tree.default",
+        "key": "enter",
+        "when": "focusedView == snippetShelf.tree"
       }
     ]
   },
