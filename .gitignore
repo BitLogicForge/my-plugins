@@ -3,5 +3,5 @@ dist/
 out/
 .vscode-test/
 packages/
-*.vsix
+
 *.log
