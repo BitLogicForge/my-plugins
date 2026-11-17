@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Snippet Shelf snippets",
+  "description": "Keys are category names, values are lists of snippets.",
+  "type": "object",
+  "allowComments": true,
+  "allowTrailingCommas": true,
+  "properties": {
+    "$schema": { "type": "string" }
+  },
+  "additionalProperties": {
+    "type": "array",
+    "description": "Snippets in this category.",
+    "items": {
+      "type": "object",
+      "required": ["name", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "description": "Shown in the list." },
+        "description": { "type": "string", "description": "Optional extra text shown next to the name." },
+        "body": {
+          "description": "The snippet text. A string, or an array of lines.\n\nVariables: {{current branch}}, {{default branch}}, {{remote url}}, {{repo name}}, {{repo root}}, {{workspace folder}}, {{workspace name}}, {{file}}, {{file name}}, {{file dir}}, {{relative file}}, {{line}}, {{selection}}, {{clipboard}}, {{date}}, {{time}}, {{uuid}}.\n\nAnything else is asked for: {{name}} free text, {{name=default}} prefilled, {{name=a|b|c}} pick one.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": ["run", "paste", "insert", "copy"],
+          "default": "run",
+          "enumDescriptions": [
+            "Send to the active terminal and run it (default).",
+            "Paste into the active terminal without running it.",
+            "Insert into the active editor at the cursor.",
+            "Copy to the clipboard."
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "name": "snippet-shelf",
+  "displayName": "Snippet Shelf",
+  "description": "Your own categorized snippets (shell commands, text) in one JSON file shared by every profile and window, with git/editor variables and prompts.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Snippets",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "snippetShelf.show",
+        "title": "Show Snippets",
+        "category": "Snippet Shelf",
+        "icon": "$(symbol-snippet)"
+      },
+      {
+        "command": "snippetShelf.run",
+        "title": "Run Snippet by Name",
+        "category": "Snippet Shelf"
+      },
+      {
+        "command": "snippetShelf.openFile",
+        "title": "Edit Snippets File",
+        "category": "Snippet Shelf",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "snippetShelf.addFromSelection",
+        "title": "Save Selection as Snippet",
+        "category": "Snippet Shelf"
+      },
+      {
+        "command": "snippetShelf.showVariables",
+        "title": "Show Variable Values",
+        "category": "Snippet Shelf"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "snippetShelf.addFromSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "snippetShelf.run",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "snippetShelf.addFromSelection",
+          "when": "editorHasSelection",
+          "group": "9_cutcopypaste@9"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "snippetShelf.show",
+          "when": "view == terminal",
+          "group": "navigation@99"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "**/.snippet-shelf.jsonc",
+        "url": "./schemas/snippets.schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node ../../scripts/build.mjs .",
+    "watch": "node ../../scripts/build.mjs --watch .",
+    "typecheck": "tsc -p . --noEmit",
+    "lint": "eslint src",
+    "compile-tests": "tsc -p . --outDir out",
+    "pretest": "npm run build && npm run compile-tests",
+    "test": "vscode-test",
+    "vscode:prepublish": "node ../../scripts/build.mjs --production .",
+    "package": "mkdir -p ../../packages && vsce package --no-dependencies --skip-license --allow-missing-repository --out ../../packages/"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  },
+  "extensionKind": [
+    "ui"
+  ]
+}

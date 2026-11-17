@@ -10,11 +10,13 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}/extensions/hello-world",
-        "--extensionDevelopmentPath=${workspaceFolder}/extensions/project-bookmarks"
+        "--extensionDevelopmentPath=${workspaceFolder}/extensions/project-bookmarks",
+        "--extensionDevelopmentPath=${workspaceFolder}/extensions/snippet-shelf"
       ],
       "outFiles": [
         "${workspaceFolder}/extensions/hello-world/dist/**/*.js",
-        "${workspaceFolder}/extensions/project-bookmarks/dist/**/*.js"
+        "${workspaceFolder}/extensions/project-bookmarks/dist/**/*.js",
+        "${workspaceFolder}/extensions/snippet-shelf/dist/**/*.js"
       ],
       "preLaunchTask": "watch: all"
     },
@@ -41,6 +43,19 @@
       ],
       "outFiles": [
         "${workspaceFolder}/extensions/project-bookmarks/dist/**/*.js"
+      ],
+      "preLaunchTask": "watch: all"
+    },
+    {
+      "name": "Run: snippet-shelf",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extensions/snippet-shelf"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extensions/snippet-shelf/dist/**/*.js"
       ],
       "preLaunchTask": "watch: all"
     }
