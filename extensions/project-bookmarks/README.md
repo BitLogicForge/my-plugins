@@ -1,9 +1,29 @@
 # Project Bookmarks
 
 Bookmark the project open in the current window (local folder, WSL, dev container, SSH, or a
-`.code-workspace` file) under a label, then reopen any bookmark from the status bar.
+`.code-workspace` file) under a label, then reopen any bookmark from the sidebar or the status bar.
 
-## Use
+## Sidebar
+
+Click the **bookmarks icon** in the activity bar (left). Hover a bookmark for **open here**, **open in
+new window** and **edit in JSON**; right-click for rename and remove. Enter opens the selected bookmark
+in the current window. Click a category to collapse or expand it; this is remembered.
+
+## Categories
+
+Click the pencil at the top of the sidebar to open the bookmarks file, and add `"category"` to any
+bookmark. Save, and the sidebar updates:
+
+```json
+[
+  { "label": "API", "category": "Work", "uri": "file:///home/me/api" },
+  { "label": "Notes", "uri": "file:///home/me/notes" }
+]
+```
+
+Bookmarks without a category are listed below the categories. Order follows the file.
+
+## Status bar
 
 - Click the **bookmark icon** in the status bar (bottom left) to see your bookmarks.
   - **Enter** opens the bookmark in the current window.

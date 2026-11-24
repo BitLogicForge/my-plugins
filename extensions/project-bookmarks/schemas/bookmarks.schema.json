@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Project Bookmarks",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["uri", "label"],
+    "properties": {
+      "label": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Name shown in the list."
+      },
+      "category": {
+        "type": "string",
+        "description": "Category the bookmark is listed under. Leave out for no category."
+      },
+      "uri": {
+        "type": "string",
+        "description": "Full folder or .code-workspace URI, including the remote authority."
+      },
+      "isWorkspaceFile": {
+        "type": "boolean",
+        "description": "true when uri points at a .code-workspace file."
+      }
+    }
+  }
+}

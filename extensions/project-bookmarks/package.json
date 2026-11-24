@@ -1,8 +1,8 @@
 {
   "name": "project-bookmarks",
   "displayName": "Project Bookmarks",
-  "description": "Bookmark projects (local, WSL, dev containers, SSH) and reopen them from a status bar icon.",
-  "version": "0.0.2",
+  "description": "Bookmark projects (local, WSL, dev containers, SSH), group them in categories and reopen them from the sidebar or status bar.",
+  "version": "0.0.3",
   "publisher": "local",
   "private": true,
   "license": "UNLICENSED",
@@ -27,7 +27,8 @@
       {
         "command": "projectBookmarks.addCurrent",
         "title": "Bookmark Current Project",
-        "category": "Project Bookmarks"
+        "category": "Project Bookmarks",
+        "icon": "$(add)"
       },
       {
         "command": "projectBookmarks.removeCurrent",
@@ -37,6 +38,35 @@
       {
         "command": "projectBookmarks.openStorageFile",
         "title": "Open Bookmarks File",
+        "category": "Project Bookmarks",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "projectBookmarks.tree.open",
+        "title": "Open in Current Window",
+        "category": "Project Bookmarks",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "projectBookmarks.tree.openNewWindow",
+        "title": "Open in New Window",
+        "category": "Project Bookmarks",
+        "icon": "$(empty-window)"
+      },
+      {
+        "command": "projectBookmarks.tree.rename",
+        "title": "Rename",
+        "category": "Project Bookmarks"
+      },
+      {
+        "command": "projectBookmarks.tree.edit",
+        "title": "Edit in Bookmarks File",
+        "category": "Project Bookmarks",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "projectBookmarks.tree.remove",
+        "title": "Remove Bookmark",
         "category": "Project Bookmarks"
       }
     ],
@@ -49,9 +79,121 @@
         {
           "command": "projectBookmarks.removeCurrent",
           "when": "projectBookmarks.currentIsBookmarked"
+        },
+        {
+          "command": "projectBookmarks.tree.open",
+          "when": "false"
+        },
+        {
+          "command": "projectBookmarks.tree.openNewWindow",
+          "when": "false"
+        },
+        {
+          "command": "projectBookmarks.tree.rename",
+          "when": "false"
+        },
+        {
+          "command": "projectBookmarks.tree.edit",
+          "when": "false"
+        },
+        {
+          "command": "projectBookmarks.tree.remove",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "projectBookmarks.addCurrent",
+          "when": "view == projectBookmarks.tree && workspaceFolderCount > 0 && !projectBookmarks.currentIsBookmarked",
+          "group": "navigation@1"
+        },
+        {
+          "command": "projectBookmarks.openStorageFile",
+          "when": "view == projectBookmarks.tree",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "projectBookmarks.tree.open",
+          "when": "view == projectBookmarks.tree && viewItem == bookmark",
+          "group": "inline@1"
+        },
+        {
+          "command": "projectBookmarks.tree.openNewWindow",
+          "when": "view == projectBookmarks.tree && viewItem == bookmark",
+          "group": "inline@2"
+        },
+        {
+          "command": "projectBookmarks.tree.edit",
+          "when": "view == projectBookmarks.tree && viewItem =~ /^bookmark/",
+          "group": "inline@3"
+        },
+        {
+          "command": "projectBookmarks.tree.open",
+          "when": "view == projectBookmarks.tree && viewItem == bookmark",
+          "group": "1_open@1"
+        },
+        {
+          "command": "projectBookmarks.tree.openNewWindow",
+          "when": "view == projectBookmarks.tree && viewItem == bookmark",
+          "group": "1_open@2"
+        },
+        {
+          "command": "projectBookmarks.tree.rename",
+          "when": "view == projectBookmarks.tree && viewItem =~ /^bookmark/",
+          "group": "2_edit@1"
+        },
+        {
+          "command": "projectBookmarks.tree.edit",
+          "when": "view == projectBookmarks.tree && viewItem =~ /^bookmark/",
+          "group": "2_edit@2"
+        },
+        {
+          "command": "projectBookmarks.tree.remove",
+          "when": "view == projectBookmarks.tree && viewItem =~ /^bookmark/",
+          "group": "3_remove@1"
         }
       ]
-    }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "projectBookmarks",
+          "title": "Project Bookmarks",
+          "icon": "media/bookmarks.svg"
+        }
+      ]
+    },
+    "views": {
+      "projectBookmarks": [
+        {
+          "id": "projectBookmarks.tree",
+          "name": "Bookmarks",
+          "icon": "media/bookmarks.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "projectBookmarks.tree",
+        "when": "!projectBookmarks.fileError",
+        "contents": "No bookmarks yet.\n[Bookmark Current Project](command:projectBookmarks.addCurrent)\n[Open Bookmarks File](command:projectBookmarks.openStorageFile)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "projectBookmarks.tree.open",
+        "key": "enter",
+        "when": "focusedView == projectBookmarks.tree && listFocus && !inputFocus"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "**/.vscode-project-bookmarks.json",
+        "url": "./schemas/bookmarks.schema.json"
+      }
+    ]
   },
   "scripts": {
     "build": "node ../../scripts/build.mjs .",
